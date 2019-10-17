@@ -2,11 +2,13 @@
 
 namespace Server;
 
+require DIR . '/utils/ConfGet.php';
+require DIR . '/app/Libraries/HttpDistribute.php';
+
 use App\Libraries\HttpDistribute;
 use App\Libraries\Request;
 use App\Libraries\Response;
 use Exception;
-use Utils\CommonUtil;
 use Utils\ConfGet;
 
 class HttpServer
@@ -34,6 +36,13 @@ class HttpServer
             'log_file' => ConfGet::get('server.HTTP.log_file'),
         ]);
 
+        $this->server->on('Start', function ($serv) {
+            // 设置进程名
+            echo "Start\n";
+            @swoole_set_process_name("reload_master");
+            //@cli_set_process_title("reload_master");
+        });
+
         $this->server->on('request', function (\Swoole\Http\Request $request, \Swoole\Http\Response $response) {
             if ($request->server['path_info'] == '/favicon.ico' || $request->server['request_uri'] == '/favicon.ico') {
                 return $response->end();
@@ -45,7 +54,8 @@ class HttpServer
         });
 
         $this->server->on('WorkerStart', function ($serv, $worker_id) {
-
+            // 框架主动加载入口，放此处支持热更新
+            require DIR . '/autoload/autoload_target.php';
         });
     }
 

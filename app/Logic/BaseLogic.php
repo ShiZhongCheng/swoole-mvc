@@ -3,7 +3,6 @@ namespace App\Logic;
 
 use App\Libraries\Request;
 use App\Libraries\SessionCache;
-use App\Libraries\UserInfo;
 
 class BaseLogic
 {

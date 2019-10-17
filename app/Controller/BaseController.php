@@ -6,7 +6,6 @@ namespace App\Controller;
 
 use App\Libraries\Request;
 use App\Libraries\SessionCache;
-use App\Libraries\UserInfo;
 
 class BaseController
 {

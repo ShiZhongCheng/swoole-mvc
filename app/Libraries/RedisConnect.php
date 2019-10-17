@@ -17,16 +17,34 @@ class RedisConnect
     public function __construct()
     {
         $this->config = $this->getConfig();
-        $this->redisHandle = new \Redis();
-        $this->redisHandle->pconnect($this->config['host'], $this->config['port']);
-        if (isset($this->config['password']) && !empty($this->config['password'])) {
-            $this->redisHandle->auth($this->config['password']);
+        $handle = RedisPool::getInstance()->pop();
+        if (!$handle) {
+            connect:
+            $this->redisHandle = new \Redis();
+            $this->redisHandle->pconnect($this->config['host'], $this->config['port']);
+            if (isset($this->config['password']) && !empty($this->config['password'])) {
+                $this->redisHandle->auth($this->config['password']);
+            }
+        } else {
+            $this->redisHandle = $handle;
+            // ping 一下，连接超时的话，重新打连接
+            try {
+                // ping用于检查当前连接的状态,成功时返回+PONG,失败时抛出一个RedisException对象.
+                // ping失败时警告:
+                // Warning: Redis::ping(): connect() failed: Connection refused
+                @$this->redisHandle->ping();
+            } catch (\RedisException $e) {
+                // 信息如 Connection lost 或 Redis server went away
+                // 断线重连
+                goto connect;
+            }
         }
     }
 
     public function __destruct()
     {
-        $this->redisHandle->close();
+        // $this->redisHandle->close();
+        RedisPool::getInstance()->push($this->redisHandle);
     }
 
     /**
@@ -65,7 +83,7 @@ class RedisConnect
     /**
      * @return mixed
      */
-    private function getConfig()
+    public function getConfig()
     {
         $redisConfig = ConfGet::get("redis");
         $count = count($redisConfig);

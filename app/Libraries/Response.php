@@ -15,7 +15,7 @@ class Response
      * Response constructor.
      * @param \Swoole\Http\Response $response
      */
-    public function __construct(\Swoole\Http\Response $response)
+    private function __construct(\Swoole\Http\Response $response)
     {
         $this->response = $response;
     }

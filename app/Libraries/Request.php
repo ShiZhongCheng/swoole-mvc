@@ -13,7 +13,7 @@ class Request
      * Request constructor.
      * @param \Swoole\Http\Request $request
      */
-    public function __construct(\Swoole\Http\Request $request)
+    private function __construct(\Swoole\Http\Request $request)
     {
         $this->request = $request;
     }

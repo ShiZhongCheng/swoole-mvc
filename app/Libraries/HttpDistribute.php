@@ -89,7 +89,7 @@ class HttpDistribute
         } catch (ApiException $e) {
             return ["code" => $e->getCode(), "msg" => $e->getMessage(), "data" => $e->getData()];
         } catch (Exception $e) {
-            return ["code" => $e->getCode(), "msg" => "fail", "data" => $e->getTrace()];
+            return ["code" => $e->getCode(), "msg" => $e->getMessage(), "data" => $e->getTrace()];
         }
     }
 }
